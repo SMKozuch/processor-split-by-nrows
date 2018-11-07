@@ -32,7 +32,7 @@ logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(levelname)-8s : [line:%(lineno)s] %(message)s',
     datefmt="%Y-%m-%d %H:%M:%S")
-"""
+
 logger = logging.getLogger()
 logging_gelf_handler = logging_gelf.handlers.GELFTCPSocketHandler(
     host=os.getenv('KBC_LOGGER_ADDR'),
@@ -43,15 +43,15 @@ logger.addHandler(logging_gelf_handler)
 
 # removes the initial stdout logging
 logger.removeHandler(logger.handlers[0])
-"""
 
-logging.debug("Current version is 0.1.1.")
+
+logging.debug("Current version is 0.1.3.")
 
 ### Access the supplied rules
 cfg = docker.Config('/data/')
 params = cfg.get_parameters()
 nrows = params['nrows']
-logging.debug("Data will be split by %s" % str(nrows))
+logging.info("Data will be split by %s" % str(nrows))
 
 ### Get proper list of tables
 os.chdir('/data/in/tables/')
@@ -81,6 +81,7 @@ def main():
     in_tables_names = [x[:-4] for x in in_tables]
 
     for name, table in zip(in_tables_names, in_tables):
+        logging.info("Splitting table %s." % name)
         data = pd.read_csv("/data/in/tables/%s" % table, dtype=str, chunksize=nrows)
 
         chunk_count = 0
